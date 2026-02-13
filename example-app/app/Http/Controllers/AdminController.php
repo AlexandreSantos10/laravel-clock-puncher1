@@ -22,21 +22,45 @@ class AdminController extends Controller
                        ->orWhere('email', 'like', '%' . $request->search . '%');
         }
 
-        // Filtros para os Logs
-        $queryLogs = Log::with('user')->orderBy('data', 'desc');
+        // Query principal de logs (para a tabela detalhada)
+        $queryLogs = Log::with('user')->orderBy('data', 'desc')->orderBy('entrada', 'desc');
 
-        if ($request->filled('date_start')) {
-            $queryLogs->whereDate('data', '>=', $request->date_start);
+        // Aplicar filtros enviados (mês/ano/user)
+        if ($request->filled('mes')) {
+            $queryLogs->whereMonth('data', $request->mes);
+        }
+        if ($request->filled('ano')) {
+            $queryLogs->whereYear('data', $request->ano);
+        }
+        if ($request->filled('user_id')) {
+            $queryLogs->where('user_id', $request->user_id);
         }
 
-        if ($request->filled('date_end')) {
-            $queryLogs->whereDate('data', '<=', $request->date_end);
-        }
+        // Estatísticas gerais (independentes dos filtros da tabela)
+        $logsPorDia = Log::select(DB::raw('DATE(data) as dia'), DB::raw('count(*) as total'))
+            ->groupBy('dia')
+            ->orderBy('dia', 'desc')
+            ->take(30)
+            ->get();
 
-        return view('admin.panel', [
-            'users' => $queryUsers->get(),
-            'logs' => $queryLogs->paginate(15)->withQueryString(),
-        ]);
+        $diaMaisAtivo = Log::select(DB::raw('DATE(data) as dia'), DB::raw('count(*) as total'))
+            ->groupBy('dia')
+            ->orderBy('total', 'desc')
+            ->first();
+
+        $totalLogsSempre = Log::count();
+        $totalDiasComLogs = Log::distinct('data')->count() ?: 1;
+        $mediaRegistos = $totalLogsSempre / $totalDiasComLogs;
+
+        // Paginado da tabela detalhada (com filtros aplicados)
+        $todosOsLogs = $queryLogs->paginate(20)->withQueryString();
+
+        // Lista de utilizadores para filtros e tabela de utilizadores
+        $users = $queryUsers->get();
+
+        return view('admin.panel', compact(
+            'users', 'logsPorDia', 'diaMaisAtivo', 'mediaRegistos', 'totalLogsSempre', 'todosOsLogs'
+        ));
     }
 
     /**
@@ -110,7 +134,7 @@ public function statistics(Request $request)
 
     $todosOsLogs = $query->paginate(20);
     $users = User::all(); // Para preencher o select de filtros
-
+    
     // Agora todas as variáveis existem!
     return view('admin.statistics', compact(
         'logsPorDia', 
@@ -121,4 +145,53 @@ public function statistics(Request $request)
         'users'
     ));
 }
+
+    public function exportLogs(Request $request)
+    {
+        $query = Log::with('user')->orderBy('data', 'desc');
+
+        if ($request->filled('mes')) {
+            $query->whereMonth('data', $request->mes);
+        }
+        if ($request->filled('ano')) {
+            $query->whereYear('data', $request->ano);
+        }
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        $logs = $query->get();
+        $format = $request->get('format', 'txt');
+
+        if ($format === 'txt') {
+            $lines = [];
+            foreach ($logs as $log) {
+                $date = $log->data->format('d/m/Y');
+                $user = $log->user->name ?? 'Unknown';
+                $entrada = $log->entrada ? $log->entrada->format('H:i') : '--:--';
+                $saida = $log->saida ? $log->saida->format('H:i') : '--:--';
+                $total = $log->total_horas ?? '0';
+                $lines[] = "$date | $user | Entrada: $entrada | Saída: $saida | Total: {$total}h";
+            }
+            $content = implode("\n", $lines);
+            $filename = 'todos-logs-'.now()->format('Y-m-d_His').'.txt';
+
+            return response($content, 200, [
+                'Content-Type' => 'text/plain; charset=utf-8',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            ]);
+        }
+
+        if ($format === 'pdf') {
+            if (class_exists('\\Barryvdh\\DomPDF\\Facade\\Pdf')) {
+                $filename = 'todos-logs-'.now()->format('Y-m-d_His').'.pdf';
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.logs_pdf', compact('logs'));
+                return $pdf->download($filename);
+            }
+
+            return back()->with('error', 'Biblioteca de geração de PDF não está instalada. Executa: composer require barryvdh/laravel-dompdf');
+        }
+
+        return back()->with('error', 'Formato de exportação não suportado.');
+    }
 }

@@ -1,14 +1,14 @@
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
-            <div class="flex items-center justify-end gap-3">
-                <a href="{{ route('user.logs') }}" class="inline-flex items-center px-4 py-2 bg-white dark:bg-[#161b2c] border dark:border-white/5 rounded-xl text-sm font-bold text-green-500 hover:bg-green-500/10">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
+                <a href="{{ route('user.logs') }}" class="inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-[#161b2c] border dark:border-white/5 rounded-2xl text-base font-bold text-green-500 hover:bg-green-500/10 w-full sm:w-auto">
                     {{ __('Meus Logs') }}
                 </a>
 
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" class="w-full sm:w-auto">
                     @csrf
-                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-white dark:bg-[#161b2c] border dark:border-white/5 rounded-xl text-sm font-bold text-rose-500">
+                    <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-[#161b2c] border dark:border-white/5 rounded-2xl text-base font-bold text-rose-500 w-full">
                         {{ __('Sair') }}
                     </button>
                 </form>

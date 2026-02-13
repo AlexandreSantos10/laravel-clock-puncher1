@@ -45,10 +45,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 Route::middleware(['auth', 'can:admin-access'])->group(function () {
     Route::get('/admin/statistics', [AdminController::class, 'statistics'])->name('admin.statistics');
+    Route::get('/admin/gestao/export', [AdminController::class, 'exportLogs'])->name('admin.logs.export');
 });
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/meus-logs', [DashboardController::class, 'meusLogs'])->name('user.logs');
+    Route::get('/meus-logs/export', [DashboardController::class, 'exportLogs'])->name('user.logs.export');
 
 
     Route::middleware(['can:admin-access'])->group(function () {

@@ -2,7 +2,7 @@
     <div class="min-h-screen flex items-center justify-center py-12 px-4">
         <div class="w-full max-w-md">
             <div class="text-center mb-6">
-                <img src="{{ asset('images/mind.png') }}" alt="Mindshaker" class="h-12 mx-auto mb-2">
+                <img src="{{ asset('images/mind.png') }}" alt="Mindshaker" class="hidden sm:block h-12 mx-auto mb-2">
                 <h1 class="text-2xl font-black text-white">Iniciar Sessão</h1>
                 <p class="text-sm text-gray-400 mt-1">Entre na sua conta para continuar</p>
             </div>

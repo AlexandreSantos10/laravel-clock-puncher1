@@ -92,4 +92,55 @@ public function registrarPonto(Request $request)
     $logs = $query->paginate(10);
     return view('user.logs', compact('logs'));
 }
+
+    public function exportLogs(Request $request)
+    {
+        $query = \App\Models\Log::where('user_id', auth()->id())->orderBy('data', 'desc');
+
+        if ($request->filled('mes')) {
+            $query->whereMonth('data', $request->mes);
+        }
+        if ($request->filled('ano')) {
+            $query->whereYear('data', $request->ano);
+        }
+        if ($request->filled('dia')) {
+            $query->whereDate('data', $request->dia);
+        }
+
+        $logs = $query->get();
+
+        $format = $request->get('format', 'txt');
+
+        if ($format === 'txt') {
+            $lines = [];
+            foreach ($logs as $log) {
+                $date = $log->data->format('d/m/Y');
+                $entrada = $log->entrada ? $log->entrada->format('H:i') : '--:--';
+                $saida = $log->saida ? $log->saida->format('H:i') : '--:--';
+                $total = $log->total_horas ?? '0';
+                $lines[] = "$date | Entrada: $entrada | Saída: $saida | Total: {$total}h";
+            }
+            $content = implode("\n", $lines);
+            $filename = 'meus-logs-'.now()->format('Y-m-d_His').'.txt';
+
+            return response($content, 200, [
+                'Content-Type' => 'text/plain; charset=utf-8',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            ]);
+        }
+
+        if ($format === 'pdf') {
+            // Verifica se a facade do barryvdh/laravel-dompdf está disponível
+            if (class_exists('\\Barryvdh\\DomPDF\\Facade\\Pdf')) {
+                $filename = 'meus-logs-'.now()->format('Y-m-d_His').'.pdf';
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('user.logs_pdf', compact('logs'));
+                return $pdf->download($filename);
+            }
+
+            // Alternativa: dompdf direto não disponível — informar o utilizador
+            return back()->with('error', 'Biblioteca de geração de PDF não está instalada. Executa: composer require barryvdh/laravel-dompdf');
+        }
+
+        return back()->with('error', 'Formato de exportação não suportado.');
+    }
 }
