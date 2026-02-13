@@ -11,13 +11,16 @@ class User extends Authenticatable implements \Illuminate\Contracts\Auth\MustVer
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'inicio_almoco', // Novo campo
-        'state',
-    ];
+    
+        protected $fillable = [
+    'name',
+    'email',
+    'password',
+    'tipo', 
+    'inicio_almoco',
+    'state',
+];
+    
 
     protected $hidden = [
         'password',

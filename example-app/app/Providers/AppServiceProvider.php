@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+// AS IMPORTAÇÕES TÊM DE ESTAR AQUI (FORA DA CLASS)
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Agora o Gate e o User já vão ser encontrados corretamente
+        Gate::define('admin-access', function (User $user) {
+            return $user->tipo === 'admin';
+        });
     }
 }
