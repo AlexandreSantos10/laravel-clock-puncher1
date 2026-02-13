@@ -69,28 +69,6 @@
                     @endif
                 </form>
             </div>
-
-            <div class="bg-[#161b22] rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
-                <div class="p-8 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
-                    <h3 class="text-sm font-black text-white uppercase tracking-[0.3em] italic">Intensidade de Atividade</h3>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-6 gap-4">
-                    @foreach($logsPorDia->take(6) as $l)
-                    <div class="bg-[#0b0e14] p-5 rounded-3xl border border-white/5">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-xs font-bold text-gray-400">{{ \Carbon\Carbon::parse($l->dia)->format('d . M . Y') }}</span>
-                            <span class="text-[10px] font-black uppercase {{ $l->total >= ($mediaRegistos + 2) ? 'text-green-500' : 'text-gray-600' }}">
-                                {{ $l->total }} REGISTOS
-                            </span>
-                        </div>
-                        <div class="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" style="width: {{ ($l->total / ($diaMaisAtivo->total ?? 1)) * 100 }}%"></div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
             <div class="bg-[#161b22] rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
@@ -141,6 +119,28 @@
                     </table>
                 </div>
             </div>
+            <div class="bg-[#161b22] rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
+                <div class="p-8 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
+                    <h3 class="text-sm font-black text-white uppercase tracking-[0.3em] italic">Intensidade de Atividade</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-6 gap-4">
+                    @foreach($logsPorDia->take(6) as $l)
+                    <div class="bg-[#0b0e14] p-5 rounded-3xl border border-white/5">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold text-gray-400">{{ \Carbon\Carbon::parse($l->dia)->format('d . M . Y') }}</span>
+                            <span class="text-[10px] font-black uppercase {{ $l->total >= ($mediaRegistos + 2) ? 'text-green-500' : 'text-gray-600' }}">
+                                {{ $l->total }} REGISTOS
+                            </span>
+                        </div>
+                        <div class="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full" style="width: {{ ($l->total / ($diaMaisAtivo->total ?? 1)) * 100 }}%"></div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            
 
             <div class="mt-6">
                 {{ $todosOsLogs->links() }}

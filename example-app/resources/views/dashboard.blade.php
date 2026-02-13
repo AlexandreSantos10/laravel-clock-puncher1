@@ -39,7 +39,7 @@
                                             placeholder="Notas de entrada..."></textarea>
                                     </div>
                                     <button type="submit" class="w-full py-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-3xl font-black tracking-widest transition-all shadow-xl shadow-indigo-500/20 active:scale-95">
-                                        INICIAR JORNADA
+                                        INICIAR DIA
                                     </button>
                                 </div>
                             @elseif(!$registoHoje->saida)
@@ -51,7 +51,7 @@
                                     class="w-full bg-[#0b0e14] border-none rounded-3xl text-gray-300 focus:ring-2 focus:ring-rose-500/50 p-5 placeholder-gray-600 mb-4 shadow-inner"
                                     placeholder="Notas de saída..."></textarea>
                                 <button type="submit" class="w-full py-6 bg-rose-600 hover:bg-rose-500 text-white rounded-3xl font-black tracking-widest transition-all shadow-xl shadow-rose-500/20 active:scale-95">
-                                    CONCLUIR TURNO
+                                    CONCLUIR DIA
                                 </button>
                             @else
                                 <div class="bg-indigo-600/5 border border-indigo-500/10 p-12 rounded-[2rem] text-center border-dashed">
